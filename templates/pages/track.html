@@ -1,0 +1,12 @@
+{% extends 'fragments/layout.html' %} {% block content %} {% include
+'fragments/timer/not_running.html' %}
+
+<div
+  id="time-table"
+  class=""
+  hx-get="/table?offset=0"
+  hx-trigger="newEntry from:body, load"
+  hx-swap="innerHTML"
+></div>
+
+{% endblock %}

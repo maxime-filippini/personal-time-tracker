@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+    <title>Time tracker app</title>
+  </head>
+  <body>
+    <script
+      src="https://unpkg.com/htmx.org@1.9.6"
+      integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni"
+      crossorigin="anonymous"
+    ></script>
+    <script src="//unpkg.com/alpinejs" defer></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="{{ url_for('static', path ='/timer.js') }}"></script>
+
+    <div class="container mx-auto px-24 py-8">
+      <h1 class="text-4xl font-bold mb-4">Time tracker</h1>
+      <p>A small app for tracking time spent, powered by HTMX and FastAPI.</p>
+      <div class="border-b-[1px] border-slate-300 w-full h-0 my-4"></div>
+
+      <nav
+        class="flex justify-between w-full px-24 text-lg underline mt-2 underline-offset-2"
+      >
+        <a hx-boost="true" href="/track">Track</a>
+        <a hx-boost="true" href="/work-items">Work items</a>
+        <a hx-boost="true" href="/analytics">Analytics</a>
+      </nav>
+
+      <div class="border-b-[1px] border-slate-300 w-full h-0 my-4"></div>
+
+      <div id="content" class="mt-4">{% block content %}{% endblock %}</div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,16 @@
+<tr class="bg-slate-100">
+  <td class="text-center">{{item["workitem"]}}</td>
+  <td class="text-center">{{item["desc"]}}</td>
+  <td class="text-center">{{item["time"]}}</td>
+  <td class="flex items-center justify-center gap-2">
+    <button
+      class="font-semibold hover:underline"
+      hx-get='/entry/{{item["id"]}}/edit'
+      hx-target="closest tr"
+      hx-swap="outerHTML"
+    >
+      Edit
+    </button>
+    <button class="font-semibold hover:underline">Delete</button>
+  </td>
+</tr>

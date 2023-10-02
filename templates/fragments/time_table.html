@@ -1,0 +1,34 @@
+<h1 class="text-2xl mb-4">Today's entries</h1>
+
+<table class="w-full table-auto rounded-md">
+  <thead class="rounded-md">
+    <tr class="bg-slate-500 text-white rounded-md">
+      <th>Work item</th>
+      <th>Description</th>
+      <th>Time</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in items %}
+
+    <tr class="{{ 'bg-slate-100' if loop.index % 2 == 0 }}">
+      <td class="text-center">{{item["workitem"]}}</td>
+      <td class="text-center">{{item["desc"]}}</td>
+      <td class="text-center">{{item["time"]}}</td>
+      <td class="flex items-center justify-center gap-2">
+        <button
+          class="font-semibold hover:underline"
+          hx-get='/entry/{{item["id"]}}/edit'
+          hx-target="#time-table"
+          hx-swap="HTML"
+        >
+          Edit
+        </button>
+        <button class="font-semibold hover:underline">Delete</button>
+      </td>
+    </tr>
+
+    {% endfor %}
+  </tbody>
+</table>

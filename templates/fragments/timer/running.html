@@ -1,0 +1,43 @@
+<div
+  id="timer"
+  class="bg-orange-300 rounded-lg h-32 my-4 px-4"
+  x-data="timer()"
+  x-init="startTimer"
+>
+  <form
+    class="flex justify-between items-center gap-2 h-full w-full"
+    hx-post="/timer/stop"
+    hx-swap="outerHTML"
+    hx-target="#timer"
+  >
+    <h3 class="text-2xl font-bold w-1/3" x-text="formattedTime"></h3>
+
+    <div class="w-full flex flex-col gap-2">
+      <div class="w-full flex items-center gap-2">
+        <label for="work-item" class="w-1/3">Work item</label>
+        <p
+          class="bg-orange-200 placeholder-emerald-500 px-2 py-1 rounded-md w-1/2"
+        >
+          {{work_item}}
+        </p>
+      </div>
+      <div class="w-full flex items-center gap-2">
+        <label for="task-desc" class="w-1/3">Task description</label>
+        <p
+          class="bg-orange-200 placeholder-emerald-500 px-2 py-1 rounded-md w-1/2"
+        >
+          {{task_desc}}
+        </p>
+      </div>
+    </div>
+
+    <input type="hidden" name="time_name" x-model="currentTime" />
+    <input type="hidden" name="work_item" value="{{work_item}}" />
+    <input type="hidden" name="task_desc" value="{{task_desc}}" />
+    <button
+      class="rounded-full h-4/5 aspect-square bg-red-500 border-[3px] border-red-900 flex items-center justify-center"
+    >
+      <p class="text-xl font-bold">STOP</p>
+    </button>
+  </form>
+</div>
