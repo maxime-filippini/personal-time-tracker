@@ -112,8 +112,10 @@ async def get_timer_page(request: Request):
 
 
 @app.get("/work-items", response_class=HTMLResponse)
-async def get_work_item_page(request: Request):
-    work_items = WORK_ITEM_SCHEMA.select_all()
+async def get_work_item_page(
+    request: Request, db: Annotated[sqlite3.Connection, Depends(get_db)]
+):
+    work_items = WORK_ITEM_SCHEMA.select_all(db)
     return templates.TemplateResponse(
         "pages/work-items.html", {"request": request, "items": work_items}
     )
