@@ -123,6 +123,7 @@ class Schema:
 
     def delete_record_by_id(self, con: sqlite3.Connection, id: str) -> None:
         con.execute(f"DELETE FROM {self.table_name} WHERE id = ?;", (id,))
+        con.commit()
 
     def _run_select_query(
         self,
