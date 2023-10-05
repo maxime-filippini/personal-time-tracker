@@ -25,7 +25,15 @@
         >
           Edit
         </button>
-        <button class="font-semibold hover:underline">Delete</button>
+        <button
+          class="font-semibold hover:underline"
+          hx-delete='/entry/{{item["id"]}}'
+          hx-confirm="Are you sure?"
+          hx-target="closest tr"
+          x-swap="outerHTML swap:1s"
+        >
+          Delete
+        </button>
       </td>
     </tr>
 
