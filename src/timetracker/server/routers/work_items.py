@@ -19,7 +19,7 @@ router = APIRouter()
 @router.get("/work-items", response_class=HTMLResponse)
 async def get_work_item_page(
     request: Request, db: Annotated[sqlite3.Connection, Depends(get_db)]
-) -> templates.TemplateResponse:
+) -> HTMLResponse:
     """Get the web page for work items interaction.
 
     Args:
@@ -27,7 +27,7 @@ async def get_work_item_page(
         db (Annotated[sqlite3.Connection, Depends): Database dependency.
 
     Returns:
-        templates.TemplateResponse: HTML page for work items.
+        HTMLResponse: HTML page for work items.
     """
     return templates.TemplateResponse(
         "pages/work-items.html",
@@ -38,7 +38,7 @@ async def get_work_item_page(
 @router.get("/work-item", response_class=HTMLResponse)
 async def get_work_item_table(
     request: Request, db: Annotated[sqlite3.Connection, Depends(get_db)]
-) -> templates.TemplateResponse:
+) -> HTMLResponse:
     """Get the list of all work items, in the form of an HTML table.
 
     Args:
@@ -57,7 +57,7 @@ async def get_work_item_table(
 @router.get("/work-item/form", response_class=HTMLResponse)
 async def add_work_item_form(
     request: Request, id: str = "", label: str = ""
-) -> templates.TemplateResponse:
+) -> HTMLResponse:
     """Get the form to add a new work item.
 
     Args:
@@ -66,7 +66,7 @@ async def add_work_item_form(
         label (str, optional): Label to pre-fill the form with. Defaults to "".
 
     Returns:
-        templates.TemplateResponse: HTML form to add a new work item.
+        HTMLResponse: HTML form to add a new work item.
     """
     return templates.TemplateResponse(
         "fragments/work_item_form.html", {"request": request, "id": id, "label": label}
@@ -76,7 +76,7 @@ async def add_work_item_form(
 @router.delete("/work-item/{id}", response_class=HTMLResponse)
 async def delete_work_item(
     request: Request, id: str, db: Annotated[sqlite3.Connection, Depends(get_db)]
-) -> templates.TemplateResponse:
+) -> HTMLResponse:
     """Delete a work item from the database.
 
     Args:
@@ -85,7 +85,7 @@ async def delete_work_item(
         db (Annotated[sqlite3.Connection, Depends): Database dependency.
 
     Returns:
-        templates.TemplateResponse: Updated table.
+        HTMLResponse: Updated table.
     """
     WORK_ITEM_SCHEMA.delete_record_by_id(db, id=id)
     return templates.TemplateResponse(
@@ -100,7 +100,7 @@ async def add_work_item(
     db: Annotated[sqlite3.Connection, Depends(get_db)],
     id: Annotated[str, Form()],
     label: Annotated[str, Form()],
-) -> templates.TemplateResponse:
+) -> HTMLResponse:
     """Add a work item to the database.
 
     Args:
@@ -110,7 +110,7 @@ async def add_work_item(
         label (Annotated[str, Form): Label of the new work item.
 
     Returns:
-        templates.TemplateResponse: Updated work item table.
+        HTMLResponse: Updated work item table.
     """
     items = WORK_ITEM_SCHEMA.select_by_id(db, id=id)
 

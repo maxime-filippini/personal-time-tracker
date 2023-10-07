@@ -9,6 +9,7 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import Form
 from fastapi.requests import Request
+from fastapi.responses import HTMLResponse
 
 from timetracker.server.db import TIME_ENTRY_SCHEMA
 from timetracker.server.dependencies import get_db
@@ -17,13 +18,13 @@ from timetracker.server.dependencies import templates
 router = APIRouter()
 
 
-@router.get("/timesheet/table")
+@router.get("/timesheet/table", response_class=HTMLResponse)
 def get_timesheet(
     request: Request,
     start_date: Annotated[str, Form],
     end_date: Annotated[str, Form],
     db: Annotated[sqlite3.Connection, Depends(get_db)],
-) -> templates.TemplateResponse:
+) -> HTMLResponse:
     """Build a timesheet based on time entries.
 
     Args:
@@ -33,7 +34,7 @@ def get_timesheet(
         db (Annotated[sqlite3.Connection, Depends): Database dependency.
 
     Returns:
-        templates.TemplateResponse: Timesheet table.
+        HTMLResponse: Timesheet table.
     """
     all_times = TIME_ENTRY_SCHEMA._run_select_query(
         db,

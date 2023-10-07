@@ -79,7 +79,7 @@ async def patch_entry(
 @router.get("/entry/{id}/edit", response_class=HTMLResponse)
 async def get_entry_edit_form(
     request: Request, id: str, db: Annotated[sqlite3.Connection, Depends(get_db)]
-) -> templates.TemplateResponse:
+) -> HTMLResponse:
     """Get the form used to edit a time entry.
 
     Args:
@@ -88,7 +88,7 @@ async def get_entry_edit_form(
         db (Annotated[sqlite3.Connection, Depends): Database dependency.
 
     Returns:
-        templates.TemplateResponse: Pre-filled form for editing of time entry.
+        HTMLResponse: Pre-filled form for editing of time entry.
     """
     entries = TIME_ENTRY_SCHEMA._run_select_query(
         db, where="WHERE id = ?", params=(id,)

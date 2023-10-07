@@ -27,7 +27,7 @@ async def start_timer(
     selected_work_item: Annotated[str, Form()],
     db: Annotated[sqlite3.Connection, Depends(get_db)],
     task_desc: Annotated[str, Form()] = None,
-) -> templates.TemplateResponse:
+) -> HTMLResponse:
     """Start a timer.
 
     Args:
@@ -38,7 +38,7 @@ async def start_timer(
         to None.
 
     Returns:
-        templates.TemplateResponse: Either a running timer, or validation.
+        HTMLResponse: Either a running timer, or validation.
     """
     if not task_desc:
         return templates.TemplateResponse(
@@ -68,7 +68,7 @@ async def stop_timer(
     work_item: Annotated[str, Form()],
     task_desc: Annotated[str, Form()],
     db: Annotated[sqlite3.Connection, Depends(get_db)],
-) -> templates.TemplateResponse:
+) -> HTMLResponse:
     """Stop a running timer.
 
     Args:
@@ -109,7 +109,7 @@ async def stop_timer(
 @router.get("/table", response_class=HTMLResponse)
 async def get_time_table(
     request: Request, offset: int, db: Annotated[sqlite3.Connection, Depends(get_db)]
-) -> templates.TemplateResponse:
+) -> HTMLResponse:
     """Get the list of a day's time entries.
 
     Args:
@@ -118,7 +118,7 @@ async def get_time_table(
         db (Annotated[sqlite3.Connection, Depends): Database dependency.
 
     Returns:
-        templates.TemplateResponse: Table of time entries.
+        HTMLResponse: Table of time entries.
     """
     today = datetime.today()
     date = today - timedelta(offset)
