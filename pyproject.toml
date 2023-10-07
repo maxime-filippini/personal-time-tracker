@@ -28,3 +28,10 @@ exclude = []
 
 [project.scripts]
 run-server = "timetracker.server:run"
+
+[tool.ruff]
+select = ["E", "F", "ANN", "D", "TRY", "N"]
+ignore = ["ANN101"]
+
+[tool.ruff.pydocstyle]
+convention = "google"  

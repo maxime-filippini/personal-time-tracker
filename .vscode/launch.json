@@ -8,8 +8,8 @@
       "name": "Python: FastAPI",
       "type": "python",
       "request": "launch",
-      "module": "uvicorn",
-      "args": ["src.server.main:app", "--reload"],
+      "module": "timetracker.server",
+      "args": ["--reload"],
       "jinja": true,
       "justMyCode": true
     }

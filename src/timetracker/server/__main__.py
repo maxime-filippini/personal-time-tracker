@@ -1,10 +1,16 @@
+"""Entry point for running the server as a Python module."""
+
 import argparse
-from unittest import defaultTestLoader
 
 import uvicorn
 
 
 def main() -> int:
+    """Main entry point for running the server.
+
+    Returns:
+        int: Exit code.
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("--port", action="store", default="8000")
     parser.add_argument("--reload", action="store_true", default=False)

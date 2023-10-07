@@ -10,6 +10,11 @@
       href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
       rel="stylesheet"
     />
+    <link
+      rel="icon"
+      href="{{ url_for('static', path ='/favicon.svg') }}?v=1"
+      type="image/x-icon"
+    />
     <title>Time tracker app</title>
   </head>
   <body>
@@ -32,7 +37,7 @@
       >
         <a hx-boost="true" href="/track">Track</a>
         <a hx-boost="true" href="/work-items">Work items</a>
-        <a hx-boost="true" href="/analytics">Analytics</a>
+        <a hx-boost="true" href="/timesheet">Timesheet</a>
       </nav>
 
       <div class="border-b-[1px] border-slate-300 w-full h-0 my-4"></div>

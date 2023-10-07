@@ -1,17 +1,25 @@
-import argparse
-from dataclasses import dataclass, field
-import sqlite3
-from typing import Any, Callable, Literal, Optional, Sequence
-from uuid import uuid4
-import pathlib
+"""Database operations used in the Timetracker application."""
 
-DB_PATH = pathlib.Path.home() / ".timetracker" / "db.db"
+import argparse
+import pathlib
+import sqlite3
+from dataclasses import dataclass
+from dataclasses import field
+from typing import Any
+from typing import Callable
+from typing import Literal
+from typing import Sequence
+from uuid import uuid4
+
+from timetracker.server.dependencies import DB_PATH
 
 TSqliteCol = Literal["TEXT", "NUMBER", "DATETIME", "varchar(500)"]
 
 
 @dataclass
 class Column:
+    """Describes a column directive in a CREATE TABLE query."""
+
     name: str
     type_: TSqliteCol
     validators: Sequence[Callable] = field(default_factory=list)
@@ -22,27 +30,64 @@ class Column:
 
 @dataclass
 class Schema:
+    """Database schema used to run queries."""
+
     table_name: str
     columns: Sequence[Column]
 
     @property
-    def column_names(self):
+    def column_names(self) -> list[str]:
+        """list[str]: Names of columns in the table."""
         return [col.name for col in self.columns]
 
     def _trim_record(self, record: dict[str, Any]) -> dict[str, Any]:
+        """Trim a record based on existing table columns.
+
+        Args:
+            record (dict[str, Any]): Record to be trimmed.
+
+        Returns:
+            dict[str, Any]: Trimmed record.
+        """
         return {k: v for k, v in record.items() if k in self.column_names}
 
     def _check_record(self, record: dict[str, Any]) -> None:
+        """Check whether a record include invalid columns.
+
+        Args:
+            record (dict[str, Any]): Record to be checked.
+
+        Raises:
+            KeyError: If at least one column does not exist in the table.
+        """
         for col in record.keys():
             if col not in self.column_names:
-                raise KeyError(f"Column '{col}' in record does not exist in table!")
+                msg = f"Column '{col}' in record does not exist in table!"
+                raise KeyError(msg)
 
     def _check_columns(self, columns: Sequence[str]) -> None:
+        """Check if columns exist in the table.
+
+        Args:
+            columns (Sequence[str]): Columns to check.
+
+        Raises:
+            KeyError: If at least one column does not exist in the table.
+        """
         for col in columns:
             if col not in self.column_names:
-                raise KeyError(f"Column '{col}' does not exist in table!")
+                msg = f"Column '{col}' does not exist in table!"
+                raise KeyError(msg)
 
     def _create_table_query(self, if_not_exists: bool) -> str:
+        """Build a CREATE TABLE query.
+
+        Args:
+            if_not_exists (bool): Whether to include a "IF NOT EXISTS" statement.
+
+        Returns:
+            str: Resulting CREATE TABLE query.
+        """
         query_columns = []
 
         for column in self.columns:
@@ -73,7 +118,15 @@ class Schema:
 
         return " ".join(query_elements)
 
-    def _insert_table_query(self, columns: Sequence[str]) -> None:
+    def _insert_table_query(self, columns: Sequence[str]) -> str:
+        """Build an INSERT query.
+
+        Args:
+            columns (Sequence[str]): Columns considered in the insert.
+
+        Returns:
+            str: Resulting INSERT query.
+        """
         self._check_columns(columns)
         return (
             f"INSERT INTO {self.table_name} ("
@@ -84,6 +137,13 @@ class Schema:
         )
 
     def create_table(self, con: sqlite3.Connection, if_not_exists: bool = True) -> None:
+        """Create a table based on schema.
+
+        Args:
+            con (sqlite3.Connection): Database connection.
+            if_not_exists (bool, optional): Only create table if it does not
+            exist. Defaults to True.
+        """
         con.execute(self._create_table_query(if_not_exists=if_not_exists))
 
     def insert_records(
@@ -92,6 +152,14 @@ class Schema:
         records: Sequence[dict[str, Any]],
         columns: Sequence[str] | None = None,
     ) -> None:
+        """Insert records in the table.
+
+        Args:
+            con (sqlite3.Connection): Database connection.
+            records (Sequence[dict[str, Any]]): Records to be added.
+            columns (Sequence[str] | None, optional): Columns to consider in the
+            insert. Defaults to None.
+        """
         if columns is None:
             columns = self.column_names
 
@@ -99,12 +167,31 @@ class Schema:
         con.executemany(self._insert_table_query(columns), records)
         con.commit()
 
-    def select_all(self, con: sqlite3.Connection, columns: Sequence[str] | None = None):
+    def select_all(
+        self, con: sqlite3.Connection, columns: Sequence[str] | None = None
+    ) -> list[dict[str, Any]]:
+        """Select all records in the database table.
+
+        Args:
+            con (sqlite3.Connection): Database connection.
+            columns (Sequence[str] | None, optional): Columns to retrieve. Defaults
+            to None.
+
+        Returns:
+            list[dict[str, Any]]: Resulting records.
+        """
         return self._run_select_query(con, params=(), columns=columns)
 
     def update_record_by_id(
         self, con: sqlite3.Connection, id: str, new_record: dict[str, Any]
     ) -> None:
+        """Update a record based on its ID.
+
+        Args:
+            con (sqlite3.Connection): Database connection.
+            id (str): ID of the record to be updated.
+            new_record (dict[str, Any]): Updated data.
+        """
         self._check_record(new_record)
 
         query = (
@@ -122,8 +209,26 @@ class Schema:
         con.commit()
 
     def delete_record_by_id(self, con: sqlite3.Connection, id: str) -> None:
+        """Delete database records based on id column.
+
+        Args:
+            con (sqlite3.Connection): Database connection.
+            id (str): ID used for deletion.
+        """
         con.execute(f"DELETE FROM {self.table_name} WHERE id = ?;", (id,))
         con.commit()
+
+    def select_by_id(self, con: sqlite3.Connection, id: str) -> list[dict[str, Any]]:
+        """Select items by the id column.
+
+        Args:
+            con (sqlite3.Connection): Database connection.
+            id (str): ID used in the filter.
+
+        Returns:
+            list[dict[str, Any]]: Resulting records.
+        """
+        return self._run_select_query(con=con, where="WHERE id = ?;", params=(id,))
 
     def _run_select_query(
         self,
@@ -132,6 +237,19 @@ class Schema:
         columns: Sequence[str] | None = None,
         where: str | None = None,
     ) -> list[dict[str, Any]]:
+        """Run a select query on the database table matching the schema.
+
+        Args:
+            con (sqlite3.Connection): Database connection.
+            params (tuple[Any, ...]): Parameters for bound query elements.
+            columns (Sequence[str] | None, optional): Columns to retrieve. Defaults
+            to None.
+            where (str | None, optional): Where statement for filtering. Defaults
+            to None.
+
+        Returns:
+            list[dict[str, Any]]: Resulting records.
+        """
         if columns is None:
             columns = self.column_names
         else:
@@ -211,21 +329,16 @@ WORK_ITEMS_SEED = (
 
 
 def setup() -> None:
+    """Set up the operational database."""
     parser = argparse.ArgumentParser()
     parser.add_argument("--db-path", action="store", default=DB_PATH)
-
     args = parser.parse_args()
 
     pathlib.Path(args.db_path).parent.mkdir(parents=True, exist_ok=True)
 
     with sqlite3.connect(args.db_path) as con:
         TIME_ENTRY_SCHEMA.create_table(con, if_not_exists=True)
-        TIME_ENTRY_SCHEMA.insert_records(con, records=TIME_ENTRIES_SEED)
-
         WORK_ITEM_SCHEMA.create_table(con, if_not_exists=True)
-        WORK_ITEM_SCHEMA.insert_records(
-            con, records=WORK_ITEMS_SEED, columns=("id", "label")
-        )
 
 
 if __name__ == "__main__":

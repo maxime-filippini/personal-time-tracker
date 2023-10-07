@@ -18,7 +18,7 @@
         <p
           class="bg-orange-200 placeholder-emerald-500 px-2 py-1 rounded-md w-1/2"
         >
-          {{work_item}}
+          {{selected_work_item}}
         </p>
       </div>
       <div class="w-full flex items-center gap-2">
@@ -32,7 +32,7 @@
     </div>
 
     <input type="hidden" name="time_name" x-model="currentTime" />
-    <input type="hidden" name="work_item" value="{{work_item}}" />
+    <input type="hidden" name="work_item" value="{{selected_work_item}}" />
     <input type="hidden" name="task_desc" value="{{task_desc}}" />
     <button
       class="rounded-full h-4/5 aspect-square bg-red-500 border-[3px] border-red-900 flex items-center justify-center"

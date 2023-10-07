@@ -1,0 +1,48 @@
+<div id="work-item-form">
+  <h1 class="text-2xl mb-4">Adding a work item</h1>
+
+  <form
+    class="flex flex-col gap-2 p-4 bg-sky-100 rounded-lg w-full"
+    hx-target="#work-item-form"
+    hx-swap="outerHTML"
+  >
+    <div class="flex gap-2 w-full">
+      <label class="w-1/3" for="work_item">ID</label>
+      <input
+        id="id"
+        name="id"
+        class="rounded-md py-1 px-2 w-2/3"
+        value="{{id}}"
+      />
+    </div>
+    {% if id_exists %}
+    <div class="w-full flex items-center gap-2 text-red-500 text-sm">
+      <div class="w-1/3"></div>
+      <p>ID already exists!</p>
+    </div>
+    {% endif %}
+    <div class="flex gap-2 w-full">
+      <label class="w-1/3" for="label">Label</label>
+      <input
+        id="label"
+        name="label"
+        class="rounded-md py-1 px-2 w-2/3"
+        value="{{label}}"
+      />
+    </div>
+    <div class="flex gap-2 w-full align-center justify-center mt-2">
+      <button
+        hx-post="/work-item"
+        class="w-1/2 bg-teal-500 hover:bg-teal-700 text-white px-2 py-1 rounded-md"
+      >
+        Save
+      </button>
+      <button
+        hx-get="/work-item"
+        class="w-1/2 bg-slate-500 hover:bg-slate-700 text-white px-2 py-1 rounded-md"
+      >
+        Cancel
+      </button>
+    </div>
+  </form>
+</div>

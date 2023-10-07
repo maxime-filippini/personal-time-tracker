@@ -1,0 +1,47 @@
+<table class="w-full table-auto rounded-md">
+  <thead class="rounded-md">
+    <tr class="bg-slate-500 text-white rounded-md">
+      <th>ID</th>
+      <th>Label</th>
+      <th>Action</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for item in items %}
+    <tr class="{{ 'bg-slate-100' if loop.index % 2 == 0 }}">
+      <td class="text-center">{{item["id"]}}</td>
+      <td class="text-center">{{item["label"]}}</td>
+      <td class="flex items-center justify-center gap-2">
+        <button
+          class="font-semibold hover:underline"
+          hx-get='/work-item/edit'
+          hx-target="closest div"
+          hx-swap="innerHTML"
+        >
+          Edit
+        </button>
+        <button
+          class="font-semibold hover:underline"
+          hx-delete='/work-item/{{item["id"]}}'
+          hx-confirm="Are you sure?"
+          hx-target="closest div"
+          x-swap="outerHTML swap:1s"
+        >
+          Delete
+        </button>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<form
+  class="flex mt-8 items-center justify-center w-full"
+  hx-get="/work-item/form"
+  hx-target="closest div"
+  hx-swap="innerHTML"
+>
+  <button class="bg-teal-500 text-white rounded-md px-2 py-1 w-full">
+    Add entry
+  </button>
+</form>
+</div>
