@@ -1,8 +1,6 @@
 """Routes related to the time tracking features."""
 
 import sqlite3
-from datetime import datetime
-from datetime import timedelta
 from typing import Annotated
 from uuid import uuid4
 
@@ -16,7 +14,7 @@ from timetracker.server.db import TIME_ENTRY_SCHEMA
 from timetracker.server.db import WORK_ITEM_SCHEMA
 from timetracker.server.dependencies import get_db
 from timetracker.server.dependencies import templates
-from timetracker.server.utils import _convert_seconds_to_time
+from timetracker.server.utils import get_daily_time_entries
 
 router = APIRouter()
 
@@ -24,9 +22,10 @@ router = APIRouter()
 @router.post("/timer/start", response_class=HTMLResponse)
 async def start_timer(
     request: Request,
-    selected_work_item: Annotated[str, Form()],
     db: Annotated[sqlite3.Connection, Depends(get_db)],
+    selected_work_item: Annotated[str, Form()],
     task_desc: Annotated[str, Form()] = None,
+    start_time: int = 0,
 ) -> HTMLResponse:
     """Start a timer.
 
@@ -36,6 +35,7 @@ async def start_timer(
         db (Annotated[sqlite3.Connection, Depends): Database dependency.
         task_desc (Annotated[str, Form, optional): Current task description. Defaults
         to None.
+        start_time (int, optional): Seed time for the timer. Defaults to 0.
 
     Returns:
         HTMLResponse: Either a running timer, or validation.
@@ -55,8 +55,10 @@ async def start_timer(
         "fragments/timer/running.html",
         {
             "request": request,
+            "id": str(uuid4()),
             "task_desc": task_desc,
             "selected_work_item": selected_work_item,
+            "start_time": start_time,
         },
     )
 
@@ -120,17 +122,7 @@ async def get_time_table(
     Returns:
         HTMLResponse: Table of time entries.
     """
-    today = datetime.today()
-    date = today - timedelta(offset)
-    sdate = date.strftime("%Y-%m-%d")
-
-    entries = TIME_ENTRY_SCHEMA._run_select_query(
-        db, where="WHERE DATE(timestamp) = ?", params=(sdate,)
-    )
-
-    for entry in entries:
-        entry["time"] = _convert_seconds_to_time(entry["time"])
-
+    entries = get_daily_time_entries(db, offset=offset)
     return templates.TemplateResponse(
         "fragments/time_entry/table.html", {"request": request, "items": entries}
     )

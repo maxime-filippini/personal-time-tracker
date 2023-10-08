@@ -1,7 +1,7 @@
 <div
   id="timer"
   class="bg-orange-300 rounded-lg h-32 my-4 px-4"
-  x-data="timer()"
+  x-data='timer("{{start_time}}")'
   x-init="startTimer"
 >
   <form
@@ -36,6 +36,7 @@
     <input type="hidden" name="task_desc" value="{{task_desc}}" />
     <button
       class="rounded-full h-4/5 aspect-square bg-red-500 border-[3px] border-red-900 flex items-center justify-center"
+      @click="stopTimer()"
     >
       <p class="text-xl font-bold">STOP</p>
     </button>

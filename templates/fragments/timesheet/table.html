@@ -17,12 +17,14 @@
     </thead>
     <tbody>
       {% for label, row in rows %}
-      <tr>
+      <tr class="{{ 'bg-slate-100' if loop.index % 2 == 0 }}">
         <th class="text-center">{{label}}</th>
-
         {% for item in row %}
         <td class="text-center">
-          <button @click='open = true; comment = "{{item["comment"]}}"'>
+          <button
+            class="text-center hover:text-slate-700 duration-100 px-2"
+            @click='open = true; comment = "{{item["comment"]}}"'
+          >
             {{item["time"]}}
           </button>
         </td>

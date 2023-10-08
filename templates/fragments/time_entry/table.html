@@ -16,12 +16,12 @@
       <td class="text-center">{{item["workitem"]}}</td>
       <td class="text-center">{{item["desc"]}}</td>
       <td class="text-center">{{item["time"]}}</td>
-      <td class="flex items-center justify-center gap-2">
+      <td class="flex items-center justify-center gap-4">
         <button
           class="font-semibold hover:underline"
           hx-get='/entry/{{item["id"]}}/edit'
           hx-target="#time-table"
-          hx-swap="HTML"
+          hx-swap="innerHTML"
         >
           Edit
         </button>
@@ -29,8 +29,8 @@
           class="font-semibold hover:underline"
           hx-delete='/entry/{{item["id"]}}'
           hx-confirm="Are you sure?"
-          hx-target="closest tr"
-          x-swap="outerHTML swap:1s"
+          hx-target="#time-table"
+          x-swap="innerHTML"
         >
           Delete
         </button>

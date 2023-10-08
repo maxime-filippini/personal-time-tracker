@@ -16,6 +16,7 @@ from timetracker.server.db import TIME_ENTRY_SCHEMA
 from timetracker.server.dependencies import get_db
 from timetracker.server.dependencies import templates
 from timetracker.server.utils import _convert_seconds_to_time
+from timetracker.server.utils import get_daily_time_entries
 
 router = APIRouter()
 
@@ -24,20 +25,28 @@ TEMPLATE_ROOT = Path("fragments/time_entry")
 
 @router.delete("/entry/{id}", response_class=RedirectResponse)
 async def delete_entry(
-    request: Request, id: str, db: Annotated[sqlite3.Connection, Depends(get_db)]
-) -> HTMLResponse:
+    request: Request,
+    id: str,
+    db: Annotated[sqlite3.Connection, Depends(get_db)],
+    offset: int = 0,
+) -> RedirectResponse:
     """Delete a time entry from the database.
 
     Args:
         request (Request): Request to be passed in context.
         id (str): ID of the time entry.
         db (Annotated[sqlite3.Connection, Depends): Database dependency.
+        offset (int): Offset page of the table.
 
     Returns:
         HTMLResponse: Successful response.
     """
     TIME_ENTRY_SCHEMA.delete_record_by_id(db, id=id)
-    return HTMLResponse(status_code=200)
+
+    entries = get_daily_time_entries(db, offset=0)
+    return templates.TemplateResponse(
+        "fragments/time_entry/table.html", {"request": request, "items": entries}
+    )
 
 
 @router.patch("/entry/{id}", response_class=RedirectResponse)
@@ -90,9 +99,7 @@ async def get_entry_edit_form(
     Returns:
         HTMLResponse: Pre-filled form for editing of time entry.
     """
-    entries = TIME_ENTRY_SCHEMA._run_select_query(
-        db, where="WHERE id = ?", params=(id,)
-    )
+    entries = TIME_ENTRY_SCHEMA.select_by_id(db, id=id)
 
     entry = entries[0]
     entry["time"] = _convert_seconds_to_time(entry["time"])

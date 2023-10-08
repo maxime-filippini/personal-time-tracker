@@ -2,10 +2,7 @@
 
 ## To do
 
-- [ ] Implement CRUD for work items
 - [ ] Allow to start a timer from an existing entries
-- [ ] Make the banded rows consistent when records are deleted
-- [ ] Add confirm on page exit when a timer is running
 
 ## How to use
 

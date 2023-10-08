@@ -49,7 +49,7 @@ async def get_work_item_table(
         templates.TemplateResponse: Table of all work items.
     """
     return templates.TemplateResponse(
-        "fragments/work_item_table.html",
+        "fragments/work_items/table.html",
         {"request": request, "items": WORK_ITEM_SCHEMA.select_all(db)},
     )
 
@@ -69,7 +69,32 @@ async def add_work_item_form(
         HTMLResponse: HTML form to add a new work item.
     """
     return templates.TemplateResponse(
-        "fragments/work_item_form.html", {"request": request, "id": id, "label": label}
+        "fragments/work_items/form.html", {"request": request, "id": id, "label": label}
+    )
+
+
+@router.get("/work-item/{id}/edit", response_class=HTMLResponse)
+async def edit_work_item_form(
+    request: Request,
+    db: Annotated[sqlite3.Connection, Depends(get_db)],
+    id: str,
+) -> HTMLResponse:
+    """Get the edit form for a work item.
+
+    Args:
+        request (Request): Request to be passed in context.
+        db (Annotated[sqlite3.Connection, Depends): Database dependency.
+        id (str): ID of the work item to edit.
+
+    Returns:
+        HTMLResponse: Edit form.
+    """
+    items = WORK_ITEM_SCHEMA.select_by_id(db, id=id)
+    item = items[0]
+
+    return templates.TemplateResponse(
+        "fragments/work_items/edit_form.html",
+        {"request": request, "item": item},
     )
 
 
@@ -89,7 +114,34 @@ async def delete_work_item(
     """
     WORK_ITEM_SCHEMA.delete_record_by_id(db, id=id)
     return templates.TemplateResponse(
-        "fragments/work_item_table.html",
+        "fragments/work_items/table.html",
+        {"request": request, "items": WORK_ITEM_SCHEMA.select_all(db)},
+    )
+
+
+@router.patch("/work-item/{id}", response_class=HTMLResponse)
+async def patch_work_item(
+    request: Request,
+    db: Annotated[sqlite3.Connection, Depends(get_db)],
+    id: str,
+    label: str | None = None,
+) -> HTMLResponse:
+    """Patch a work item.
+
+    Args:
+        request (Request): Request to be passed in context.
+        db (Annotated[sqlite3.Connection, Depends): Database dependency.
+        id (str): ID of the work item to be edited.
+        label (str | None, optional): New label. Defaults to None.
+
+    Returns:
+        HTMLResponse: Updated table.
+    """
+    if label:
+        WORK_ITEM_SCHEMA.update_record_by_id(db, id=id, new_record={"label": label})
+
+    return templates.TemplateResponse(
+        "fragments/work_items/table.html",
         {"request": request, "items": WORK_ITEM_SCHEMA.select_all(db)},
     )
 
@@ -126,6 +178,6 @@ async def add_work_item(
     )
 
     return templates.TemplateResponse(
-        "fragments/work_item_table.html",
+        "fragments/work_items/table.html",
         {"request": request, "items": WORK_ITEM_SCHEMA.select_all(db)},
     )

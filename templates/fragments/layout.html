@@ -26,7 +26,12 @@
     <script src="//unpkg.com/alpinejs" defer></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="{{ url_for('static', path ='/timer.js') }}"></script>
-
+    <script>
+      window.addEventListener("beforeunload", function (event) {
+        event.preventDefault();
+        return (event.returnValue = "");
+      });
+    </script>
     <div class="container mx-auto px-24 py-8">
       <h1 class="text-4xl font-bold mb-4">Time tracker</h1>
       <p>A small app for tracking time spent, powered by HTMX and FastAPI.</p>

@@ -14,7 +14,7 @@
       <td class="flex items-center justify-center gap-2">
         <button
           class="font-semibold hover:underline"
-          hx-get='/work-item/edit'
+          hx-get='/work-item/{{item["id"]}}/edit'
           hx-target="closest div"
           hx-swap="innerHTML"
         >

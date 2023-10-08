@@ -7,7 +7,6 @@ from typing import Annotated
 
 from fastapi import APIRouter
 from fastapi import Depends
-from fastapi import Form
 from fastapi.requests import Request
 from fastapi.responses import HTMLResponse
 
@@ -21,16 +20,16 @@ router = APIRouter()
 @router.get("/timesheet/table", response_class=HTMLResponse)
 def get_timesheet(
     request: Request,
-    start_date: Annotated[str, Form],
-    end_date: Annotated[str, Form],
+    start_date: str,
+    end_date: str,
     db: Annotated[sqlite3.Connection, Depends(get_db)],
 ) -> HTMLResponse:
     """Build a timesheet based on time entries.
 
     Args:
         request (Request): Request to be passed in context.
-        start_date (Annotated[str, Form]): Start date for the timesheet.
-        end_date (Annotated[str, Form]): End date for the timesheet.
+        start_date (Annotated[str, Form()]): Start date for the timesheet.
+        end_date (Annotated[str, Form()]): End date for the timesheet.
         db (Annotated[sqlite3.Connection, Depends): Database dependency.
 
     Returns:
@@ -44,11 +43,16 @@ def get_timesheet(
 
     # A timesheet has two axes - Workitems and dates
     u_workitems = set(time["workitem"] for time in all_times)
-    u_dates = set(
-        datetime.strptime(time["timestamp"], "%Y-%m-%d %H:%M:%S")
-        .date()
-        .strftime("%d/%m")
-        for time in all_times
+    u_dates = sorted(
+        list(
+            set(
+                datetime.strptime(time["timestamp"], "%Y-%m-%d %H:%M:%S")
+                .date()
+                .strftime("%d/%m")
+                for time in all_times
+            )
+        ),
+        key=lambda s: datetime.strptime(s, "%d/%m"),
     )
 
     timesheet_data = defaultdict(lambda: defaultdict(list))
